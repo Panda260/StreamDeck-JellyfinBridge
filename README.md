@@ -1,0 +1,2 @@
+# StreamDeck-JellyfinBridge
+Ai Code
