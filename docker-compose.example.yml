@@ -18,9 +18,9 @@ services:
       HA_ENTITY_ZFS_HEALTH: "input_text.zfs_pool_health"
       HA_ENTITY_ZFS_CAPACITY: "input_number.zfs_pool_capacity"
     volumes:
-      # Provide zpool binary and device read-only so the container can query the pool
-      # Use the exact host path returned by `command -v zpool` (commonly /sbin/zpool or /usr/sbin/zpool).
-      # If Docker reports a read-only filesystem while trying to create the source path, the host path is wrong.
-      - /sbin/zpool:/usr/sbin/zpool:ro
+      # Provide the zpool binary and device read-only so the container can query the pool
+      # Detect the host path with: command -v zpool (commonly /sbin/zpool or /usr/sbin/zpool)
+      # Mount the containing directory, not a single file, to avoid read-only filesystem errors if the path is wrong.
+      - /sbin:/sbin:ro     # replace /sbin with $(dirname $(command -v zpool)) from your host
       - /dev/zfs:/dev/zfs:ro
     restart: unless-stopped

@@ -30,7 +30,16 @@ A lightweight Python bridge that pulls Jellyfin statistics and forwards them int
 
 All helper entities must already exist in Home Assistant (for example as `counter` or `input_number` helpers). The bridge simply sets their `state` value.
 
-ZFS metrics are optional. When `ENABLE_ZFS` is `true`, the container must be able to run `zpool list` for the specified pool (e.g., by mounting your host's `zpool` directory and `/dev/zfs` read-only or by providing a ZFS exporter endpoint inside the container). Pool capacity is reported with three decimal places. The path to the `zpool` binary varies by distro—`command -v zpool` on the host often returns `/usr/sbin/zpool`. To avoid Docker trying to create a file on a read-only root filesystem, mount the entire directory that contains `zpool` (e.g., `/usr/sbin:/usr/sbin:ro`) instead of a single file path.
+ZFS metrics are optional. When `ENABLE_ZFS` is `true`, the container must be able to run `zpool list` for the specified pool (e.g., by mounting your host's `zpool` directory and `/dev/zfs` read-only or by providing a ZFS exporter endpoint inside the container). Pool capacity is reported with three decimal places. The path to the `zpool` binary varies by distro—use `command -v zpool` on the host to see the exact path:
+
+```bash
+command -v zpool
+# Example output: /sbin/zpool
+
+# If nothing is printed, install ZFS tools or ensure they are in PATH.
+```
+
+Once you know the path, mount the entire directory that contains `zpool` to avoid Docker trying to create a file on a read-only root filesystem (e.g., `/sbin:/sbin:ro` or `/usr/sbin:/usr/sbin:ro`, depending on the output of the command above).
 
 ## Running locally
 
@@ -63,12 +72,12 @@ services:
       ZFS_POOL: "tank"
       HA_ENTITY_ZFS_HEALTH: "input_text.zfs_pool_health"
       HA_ENTITY_ZFS_CAPACITY: "input_number.zfs_pool_capacity"
-    volumes:
-      # Provide zpool binary and device read-only so the container can query the pool
-      # Use the exact host path returned by `command -v zpool` (commonly /sbin/zpool or /usr/sbin/zpool).
-      # If Docker reports a read-only filesystem while trying to create the source path, the host path is wrong.
-      - /sbin/zpool:/usr/sbin/zpool:ro
-      - /dev/zfs:/dev/zfs:ro
+      volumes:
+        # Provide the zpool binary directory and device read-only so the container can query the pool
+        # Detect the host path with: command -v zpool (commonly /sbin/zpool or /usr/sbin/zpool)
+        # Mount the containing directory, not a single file, to avoid read-only filesystem errors if the path is wrong.
+        - /sbin:/sbin:ro     # replace /sbin with $(dirname $(command -v zpool)) from your host
+        - /dev/zfs:/dev/zfs:ro
     restart: unless-stopped
 ```
 
