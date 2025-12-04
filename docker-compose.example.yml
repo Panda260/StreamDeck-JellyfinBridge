@@ -12,4 +12,15 @@ services:
       HA_ENTITY_MOVIES: "counter.jellyfin_movies"
       HA_ENTITY_SERIES: "counter.jellyfin_series"
       HA_ENTITY_EPISODES: "counter.jellyfin_episodes"
+      # Optional ZFS metrics
+      ENABLE_ZFS: "true"
+      ZFS_POOL: "tank"
+      ZPOOL_BINARY: "/usr/local/sbin/zpool"  # adjust to match the path on your host
+      HA_ENTITY_ZFS_HEALTH: "input_text.zfs_pool_health"
+      HA_ENTITY_ZFS_CAPACITY: "input_number.zfs_pool_capacity"
+    volumes:
+      # Provide the zpool binary directory and device read-only so the container can query the pool
+      # Adjust the host path if your `command -v zpool` differs; e.g., /usr/sbin or /usr/local/sbin
+      - /usr/local/sbin:/usr/local/sbin:ro
+      - /dev/zfs:/dev/zfs:ro
     restart: unless-stopped
