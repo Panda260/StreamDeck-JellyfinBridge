@@ -1,0 +1,15 @@
+services:
+  jellyfin-bridge:
+    build: .
+    container_name: jellyfin-bridge
+    environment:
+      JELLYFIN_URL: "http://jellyfin:8096"
+      JELLYFIN_API_KEY: "replace-with-jellyfin-api-key"
+      HA_URL: "http://homeassistant:8123"
+      HA_TOKEN: "replace-with-homeassistant-token"
+      SYNC_INTERVAL_SECONDS: 300
+      HA_ENTITY_USERS: "counter.jellyfin_users"
+      HA_ENTITY_MOVIES: "counter.jellyfin_movies"
+      HA_ENTITY_SERIES: "counter.jellyfin_series"
+      HA_ENTITY_EPISODES: "counter.jellyfin_episodes"
+    restart: unless-stopped
