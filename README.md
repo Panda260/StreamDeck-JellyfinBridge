@@ -30,16 +30,7 @@ A lightweight Python bridge that pulls Jellyfin statistics and forwards them int
 
 All helper entities must already exist in Home Assistant (for example as `counter` or `input_number` helpers). The bridge simply sets their `state` value.
 
-ZFS metrics are optional. When `ENABLE_ZFS` is `true`, the container must be able to run `zpool list` for the specified pool (e.g., by mounting your host's `zpool` directory and `/dev/zfs` read-only or by providing a ZFS exporter endpoint inside the container). Pool capacity is reported with three decimal places. The path to the `zpool` binary varies by distro—use `command -v zpool` on the host to see the exact path:
-
-```bash
-command -v zpool
-# Example output: /sbin/zpool
-
-# If nothing is printed, install ZFS tools or ensure they are in PATH.
-```
-
-Once you know the path, mount the entire directory that contains `zpool` to avoid Docker trying to create a file on a read-only root filesystem (e.g., `/sbin:/sbin:ro` or `/usr/sbin:/usr/sbin:ro`, depending on the output of the command above).
+ZFS metrics are optional. When `ENABLE_ZFS` is `true`, the container must be able to run `zpool list` for the specified pool (e.g., by mounting your host's `zpool` directory and `/dev/zfs` read-only or by providing a ZFS exporter endpoint inside the container). Pool capacity is reported with three decimal places. Mount the directory that contains the `zpool` binary (for example, `/usr/local/sbin:/usr/local/sbin:ro` or `/usr/sbin:/usr/sbin:ro`) to avoid Docker trying to create a file on a read-only root filesystem.
 
 ## Running locally
 
@@ -74,9 +65,8 @@ services:
       HA_ENTITY_ZFS_CAPACITY: "input_number.zfs_pool_capacity"
       volumes:
         # Provide the zpool binary directory and device read-only so the container can query the pool
-        # Detect the host path with: command -v zpool (commonly /sbin/zpool or /usr/sbin/zpool)
-        # Mount the containing directory, not a single file, to avoid read-only filesystem errors if the path is wrong.
-        - /sbin:/sbin:ro     # replace /sbin with $(dirname $(command -v zpool)) from your host
+        # Mount the containing directory to avoid read-only filesystem errors if the path is wrong.
+        - /usr/local/sbin:/usr/local/sbin:ro   # adjust if your zpool binary lives elsewhere (e.g., /usr/sbin)
         - /dev/zfs:/dev/zfs:ro
     restart: unless-stopped
 ```
