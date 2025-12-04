@@ -65,9 +65,9 @@ services:
       HA_ENTITY_ZFS_CAPACITY: "input_number.zfs_pool_capacity"
     volumes:
       # Provide zpool binary and device read-only so the container can query the pool
-      # Mount the directory containing zpool to avoid creating a file on a read-only filesystem
-      # Replace /usr/sbin with the parent directory from `command -v zpool` on your host if different
-      - /usr/sbin:/usr/sbin:ro
+      # Use the exact host path returned by `command -v zpool` (commonly /sbin/zpool or /usr/sbin/zpool).
+      # If Docker reports a read-only filesystem while trying to create the source path, the host path is wrong.
+      - /sbin/zpool:/usr/sbin/zpool:ro
       - /dev/zfs:/dev/zfs:ro
     restart: unless-stopped
 ```
