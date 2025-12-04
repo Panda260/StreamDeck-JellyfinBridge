@@ -11,17 +11,17 @@ A lightweight Python bridge that pulls Jellyfin statistics and forwards them int
 
 ## Environment variables
 
-| Name | Description |
-| --- | --- |
-| `JELLYFIN_URL` | Base URL of your Jellyfin server (e.g., `http://jellyfin:8096`). |
-| `JELLYFIN_API_KEY` | Jellyfin API key with permission to read library and user data. |
-| `HA_URL` | Base URL of Home Assistant (e.g., `http://homeassistant:8123`). |
-| `HA_TOKEN` | Long-lived access token for Home Assistant. |
-| `SYNC_INTERVAL_SECONDS` | Polling interval in seconds (default: `300`). |
-| `HA_ENTITY_USERS` | Entity ID of the Home Assistant helper that should store the Jellyfin user count. |
-| `HA_ENTITY_MOVIES` | Entity ID for the movie counter helper. |
-| `HA_ENTITY_SERIES` | Entity ID for the series counter helper. |
-| `HA_ENTITY_EPISODES` | Entity ID for the episode counter helper. |
+| Name                    | Description                                                                       |
+| ----------------------- | --------------------------------------------------------------------------------- |
+| `JELLYFIN_URL`          | Base URL of your Jellyfin server (e.g., `http://jellyfin:8096`).                  |
+| `JELLYFIN_API_KEY`      | Jellyfin API key with permission to read library and user data.                   |
+| `HA_URL`                | Base URL of Home Assistant (e.g., `http://homeassistant:8123`).                   |
+| `HA_TOKEN`              | Long-lived access token for Home Assistant.                                       |
+| `SYNC_INTERVAL_SECONDS` | Polling interval in seconds (default: `300`).                                     |
+| `HA_ENTITY_USERS`       | Entity ID of the Home Assistant helper that should store the Jellyfin user count. |
+| `HA_ENTITY_MOVIES`      | Entity ID for the movie counter helper.                                           |
+| `HA_ENTITY_SERIES`      | Entity ID for the series counter helper.                                          |
+| `HA_ENTITY_EPISODES`    | Entity ID for the episode counter helper.                                         |
 
 All helper entities must already exist in Home Assistant (for example as `counter` or `input_number` helpers). The bridge simply sets their `state` value.
 
@@ -39,7 +39,7 @@ python -m bridge
 ```yaml
 services:
   jellyfin-bridge:
-    image: ghcr.io/your-org/streamdeck-jellyfinbridge:latest
+    image: ghcr.io/panda260/streamdeck-jellyfinbridge:latest
     build: .
     environment:
       JELLYFIN_URL: "http://jellyfin:8096"
