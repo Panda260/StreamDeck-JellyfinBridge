@@ -30,7 +30,7 @@ A lightweight Python bridge that pulls Jellyfin statistics and forwards them int
 
 All helper entities must already exist in Home Assistant (for example as `counter` or `input_number` helpers). The bridge simply sets their `state` value.
 
-ZFS metrics are optional. When `ENABLE_ZFS` is `true`, the container must be able to run `zpool list` for the specified pool (e.g., by mounting `/sbin/zpool` and `/dev/zfs` read-only or by providing a ZFS exporter endpoint inside the container). Pool capacity is reported with three decimal places.
+ZFS metrics are optional. When `ENABLE_ZFS` is `true`, the container must be able to run `zpool list` for the specified pool (e.g., by mounting your host's `zpool` binary and `/dev/zfs` read-only or by providing a ZFS exporter endpoint inside the container). Pool capacity is reported with three decimal places. The path to the `zpool` binary varies by distro—`command -v zpool` on the host often returns `/usr/sbin/zpool`; use that path in the bind mount instead of `/sbin/zpool` if needed.
 
 ## Running locally
 
@@ -65,7 +65,8 @@ services:
       HA_ENTITY_ZFS_CAPACITY: "input_number.zfs_pool_capacity"
     volumes:
       # Provide zpool binary and device read-only so the container can query the pool
-      - /sbin/zpool:/sbin/zpool:ro
+      # Replace /usr/sbin/zpool with the path from `command -v zpool` on your host if different
+      - /usr/sbin/zpool:/usr/sbin/zpool:ro
       - /dev/zfs:/dev/zfs:ro
     restart: unless-stopped
 ```
