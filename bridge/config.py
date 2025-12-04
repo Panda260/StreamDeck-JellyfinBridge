@@ -17,6 +17,7 @@ class HomeAssistantEntities:
 class ZfsConfig:
     enabled: bool
     pool: str | None
+    binary: str
 
 
 @dataclass
@@ -39,6 +40,7 @@ class AppConfig:
 
         zfs_enabled = os.getenv("ENABLE_ZFS", "false").lower() in {"1", "true", "yes"}
         zfs_pool = os.getenv("ZFS_POOL") if zfs_enabled else None
+        zfs_binary = os.getenv("ZPOOL_BINARY", "zpool")
 
         entities = HomeAssistantEntities(
             users=_require_env("HA_ENTITY_USERS"),
@@ -64,7 +66,7 @@ class AppConfig:
             home_assistant_token=home_assistant_token,
             interval_seconds=interval_seconds,
             entities=entities,
-            zfs=ZfsConfig(enabled=zfs_enabled, pool=zfs_pool),
+            zfs=ZfsConfig(enabled=zfs_enabled, pool=zfs_pool, binary=zfs_binary),
         )
 
     def metric_map(self) -> Dict[str, str]:

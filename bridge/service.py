@@ -16,7 +16,11 @@ class BridgeService:
         self.home_assistant = HomeAssistantClient(
             config.home_assistant_url, config.home_assistant_token
         )
-        self.zfs = ZfsClient(config.zfs.pool) if config.zfs.enabled and config.zfs.pool else None
+        self.zfs = (
+            ZfsClient(config.zfs.pool, config.zfs.binary)
+            if config.zfs.enabled and config.zfs.pool
+            else None
+        )
 
     def run_forever(self) -> None:
         logger.info("Starting Jellyfin -> Home Assistant bridge with %s second interval", self.config.interval_seconds)

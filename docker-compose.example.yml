@@ -15,6 +15,7 @@ services:
       # Optional ZFS metrics
       ENABLE_ZFS: "true"
       ZFS_POOL: "tank"
+      ZPOOL_BINARY: "/usr/local/sbin/zpool"  # adjust to match the path on your host
       HA_ENTITY_ZFS_HEALTH: "input_text.zfs_pool_health"
       HA_ENTITY_ZFS_CAPACITY: "input_number.zfs_pool_capacity"
     volumes:

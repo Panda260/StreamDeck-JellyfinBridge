@@ -5,8 +5,9 @@ logger = logging.getLogger(__name__)
 
 
 class ZfsClient:
-    def __init__(self, pool: str) -> None:
+    def __init__(self, pool: str, binary: str) -> None:
         self.pool = pool
+        self.binary = binary
 
     def get_metrics(self) -> dict[str, object]:
         capacity, health = self._get_pool_status()
@@ -16,7 +17,7 @@ class ZfsClient:
         }
 
     def _get_pool_status(self) -> tuple[float, str]:
-        command = ["zpool", "list", "-Hp", "-o", "capacity,health", self.pool]
+        command = [self.binary, "list", "-Hp", "-o", "capacity,health", self.pool]
         logger.debug("Running ZFS command: %s", " ".join(command))
         result = subprocess.run(command, capture_output=True, text=True, check=True)
         output = result.stdout.strip()

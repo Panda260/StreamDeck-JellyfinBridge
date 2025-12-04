@@ -25,12 +25,13 @@ A lightweight Python bridge that pulls Jellyfin statistics and forwards them int
 | `HA_ENTITY_EPISODES`    | Entity ID for the episode counter helper.                                         |
 | `ENABLE_ZFS`            | Set to `true`/`1` to enable ZFS metrics collection.                               |
 | `ZFS_POOL`              | Name of the ZFS pool to query (required when `ENABLE_ZFS` is enabled).            |
+| `ZPOOL_BINARY`          | Path to the `zpool` binary inside the container (default: `zpool`).               |
 | `HA_ENTITY_ZFS_HEALTH`  | Entity ID that should store the ZFS pool health string (e.g., `ONLINE`).          |
 | `HA_ENTITY_ZFS_CAPACITY`| Entity ID that should store the ZFS pool capacity percentage (three decimals).    |
 
 All helper entities must already exist in Home Assistant (for example as `counter` or `input_number` helpers). The bridge simply sets their `state` value.
 
-ZFS metrics are optional. When `ENABLE_ZFS` is `true`, the container must be able to run `zpool list` for the specified pool (e.g., by mounting your host's `zpool` directory and `/dev/zfs` read-only or by providing a ZFS exporter endpoint inside the container). Pool capacity is reported with three decimal places. Mount the directory that contains the `zpool` binary (for example, `/usr/local/sbin:/usr/local/sbin:ro` or `/usr/sbin:/usr/sbin:ro`) to avoid Docker trying to create a file on a read-only root filesystem.
+ZFS metrics are optional. When `ENABLE_ZFS` is `true`, the container must be able to run `zpool list` for the specified pool (e.g., by mounting your host's `zpool` directory and `/dev/zfs` read-only or by providing a ZFS exporter endpoint inside the container). Pool capacity is reported with three decimal places. Mount the directory that contains the `zpool` binary (for example, `/usr/local/sbin:/usr/local/sbin:ro` or `/usr/sbin:/usr/sbin:ro`) and set `ZPOOL_BINARY` to the full binary path (e.g., `/usr/local/sbin/zpool`) if it is not already on the container `PATH` to avoid read-only filesystem errors and missing-binary failures.
 
 ## Running locally
 
@@ -61,13 +62,14 @@ services:
       # Optional ZFS metrics
       ENABLE_ZFS: "true"
       ZFS_POOL: "tank"
+      ZPOOL_BINARY: "/usr/local/sbin/zpool"  # adjust to your host path if different
       HA_ENTITY_ZFS_HEALTH: "input_text.zfs_pool_health"
       HA_ENTITY_ZFS_CAPACITY: "input_number.zfs_pool_capacity"
-      volumes:
-        # Provide the zpool binary directory and device read-only so the container can query the pool
-        # Mount the containing directory to avoid read-only filesystem errors if the path is wrong.
-        - /usr/local/sbin:/usr/local/sbin:ro   # adjust if your zpool binary lives elsewhere (e.g., /usr/sbin)
-        - /dev/zfs:/dev/zfs:ro
+    volumes:
+      # Provide the zpool binary directory and device read-only so the container can query the pool
+      # Mount the containing directory to avoid read-only filesystem errors if the path is wrong.
+      - /usr/local/sbin:/usr/local/sbin:ro   # adjust if your zpool binary lives elsewhere (e.g., /usr/sbin)
+      - /dev/zfs:/dev/zfs:ro
     restart: unless-stopped
 ```
 
